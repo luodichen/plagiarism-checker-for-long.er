@@ -7,6 +7,7 @@ Created on Jun 2, 2015
 from pyquery import PyQuery
 import urllib2
 import re
+import difflib
 
 def remove_html_label(original):
     r = re.compile(r'<[^>]+>', re.S)
@@ -15,6 +16,10 @@ def remove_html_label(original):
 def get_text(url):
     original = urllib2.urlopen(url).read()
     return remove_html_label(original)
+
+def get_text2(url):
+    pq = PyQuery(url)
+    return pq("body").text()
 
 def get_article_meta(url):
     ret = {}
@@ -34,11 +39,8 @@ def get_article_meta(url):
     
     return ret
 
-result =  get_article_meta("http://training.hnteacher.net/Elearning/ClassPortal/GoodHomeworkDetail.aspx?ID=531639&CLASS_ID=4300000000f16&Tatget=")
-print result['title']
-print result['publish']
-print result['publish_date']
-print result['submit']
-print result['submit_date']
-print result['article']
-print result['content']
+result =  get_article_meta("http://training.hnteacher.net/Elearning/ClassPortal/GoodHomeworkDetail.aspx?ID=539142&CLASS_ID=4300000000ef6&Tatget=")
+
+content1 = result['content']
+content2 = get_text2("http://blog.sina.com.cn/s/blog_7a274a540100prax.html")
+
