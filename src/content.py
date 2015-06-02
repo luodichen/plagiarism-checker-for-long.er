@@ -1,3 +1,4 @@
+# encoding=utf-8
 '''
 Created on Jun 2, 2015
 
@@ -6,19 +7,15 @@ Created on Jun 2, 2015
 
 from pyquery import PyQuery
 import urllib2
+import string
 import re
-import difflib
 
 def remove_html_label(original):
     r = re.compile(r'<[^>]+>', re.S)
     return r.sub('', original)
 
 def get_text(url):
-    original = urllib2.urlopen(url).read()
-    return remove_html_label(original)
-
-def get_text2(url):
-    pq = PyQuery(url)
+    pq = PyQuery(urllib2.urlopen(url).read())
     return pq("body").text()
 
 def get_article_meta(url):
@@ -39,8 +36,6 @@ def get_article_meta(url):
     
     return ret
 
-result =  get_article_meta("http://training.hnteacher.net/Elearning/ClassPortal/GoodHomeworkDetail.aspx?ID=539142&CLASS_ID=4300000000ef6&Tatget=")
-
-content1 = result['content']
-content2 = get_text2("http://blog.sina.com.cn/s/blog_7a274a540100prax.html")
-
+def pre_process(original):
+    char_remove = string.punctuation + string.digits + u"【】｛｝（）《》，。？、“”’‘；： \t"
+    return "".join([c for c in original if c not in char_remove])
