@@ -15,6 +15,15 @@ class Data(object):
         self.db = dbfile
         self.conn = sqlite3.connect(dbfile)
         self.create()
+        
+    @staticmethod
+    def dict_fetchone(cursor):
+        result = cursor.fetchone()
+        if None == result:
+            return None
+        else:
+            desc = (x[0] for x in cursor.description)
+            return dict(zip(desc, result))
     
     def create(self):
         # status
@@ -46,19 +55,51 @@ class Data(object):
         self.conn.commit()
         
     def request_task(self):
+        ret = None
         sql_query = '''SELECT * FROM pcdata WHERE status = 0 
                         ORDER BY create_time LIMIT 0, 1'''
         sql_update = '''UPDATE pcdata SET status = ?, update_time = ?
                         WHERE _id = ?'''
+        
         try:
             g_mutex.acquire(1)
+            
+            cursor = self.conn.cursor()
+            cursor.execute(sql_query)
+            ret = self.dict_fetchone(cursor)
+            
+            if None != ret:
+                update_param = (1, time.time(), ret['_id'])
+                cursor.execute(sql_update, update_param)
+                self.conn.commit()
+            
         except Exception, e:
             raise e
         finally:
             g_mutex.release()
-
-def test():
-    pass
-    Data(r"C:\test.db").request_task()
+        
+        return ret
     
-test()
+    def report_process(self, task_id, process):
+        sql = '''UPDATE pcdata SET status = ?, update_time = ?, completion = ?
+                 WHERE _id = ?'''
+        params = (1, time.time(), process, task_id)
+        self.conn.cursor().execute(sql, params)
+        self.conn.commit()
+        
+    def report_meta(self, task_id, title, author, meta_data):
+        sql = '''UPDATE pcdata SET status = ?, update_time = ?, title = ?,
+                author = ?, meta_data = ?
+                WHERE _id = ?'''
+        params = (1, time.time(), title, author, meta_data, task_id)
+        self.conn.cursor().execute(sql, params)
+        self.conn.commit()
+    
+    def report_result(self, task_id, result, result_meta):
+        sql = '''UPDATE pcdata SET status = ?, update_time = ?, result = ?,
+                result_meta = ?, completion = ?
+                WHERE _id = ?'''
+        params = (2, time.time(), result, result_meta, 100, task_id)
+        self.conn.cursor().execute(sql, params)
+        self.conn.commit()
+
