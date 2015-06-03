@@ -47,18 +47,27 @@ def analysis(url, choise = 3):
     
     totalpart = 0
     match_set = set()
+    details = []
     
     for kw in keywords: 
-        match_urls = bdparser.get_result(kw)
+        try:
+            match_urls = bdparser.get_result(kw)
+        except:
+            continue
         for match_url in match_urls:
-            match_text = pre_process(content.get_text(match_url))
-            _, totalpart, cur_set = text_match(article_content, match_text)
-            match_set.update(cur_set)
+            try:
+                match_text = pre_process(content.get_text(match_url))
+                _, totalpart, cur_set = text_match(article_content, match_text)
+                match_set.update(cur_set)
+                details.append((match_url, cur_set))
+                print "%s - %d" % (match_url, 100 * _ / totalpart)
+            except:
+                continue
     
     return totalpart, match_set
 
 def test():
-    total, match_set = analysis("http://training.hnteacher.net/Elearning/ClassPortal/GoodHomeworkDetail.aspx?ID=539142&CLASS_ID=4300000000ef6&Tatget=")
+    total, match_set = analysis("http://training.hnteacher.net/Elearning/ClassPortal/Experience_detail.aspx?ID=303812&CLASS_ID=4306000000045&Tatget=")
     print 100 * len(match_set) / total
     print match_set
 

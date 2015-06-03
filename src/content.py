@@ -21,18 +21,23 @@ def get_text(url):
 def get_article_meta(url):
     ret = {}
     pq = PyQuery(url)
-    r_meta = re.compile(r'<strong.+</strong>', re.S)
     
-    ret['title'] = pq("div[class='shows'] h1").html()
-    metadata = pq("table[class='yss'] td")
-    ret['publish'] = r_meta.sub('', metadata.eq(0).html()).strip()
-    ret['publish_date'] = r_meta.sub('', metadata.eq(1).html()).strip()
-    ret['submit'] = r_meta.sub('', metadata.eq(2).html()).strip()
-    ret['submit_date'] = r_meta.sub('', metadata.eq(3).html()).strip()
-    
-    content = pq("div[class='show'] table tr")
-    ret['article'] = content.eq(0).children("td").eq(1).text()
-    ret['content'] = content.eq(1).children("td").eq(1).text()
+    if (url.lower().find("goodhomeworkdetail.aspx") != -1):
+        r_meta = re.compile(r'<strong.+</strong>', re.S)
+        
+        ret['title'] = pq("div[class='shows'] h1").html()
+        metadata = pq("table[class='yss'] td")
+        ret['publish'] = r_meta.sub('', metadata.eq(0).html()).strip()
+        ret['publish_date'] = r_meta.sub('', metadata.eq(1).html()).strip()
+        ret['submit'] = r_meta.sub('', metadata.eq(2).html()).strip()
+        ret['submit_date'] = r_meta.sub('', metadata.eq(3).html()).strip()
+        
+        content = pq("div[class='show'] table tr")
+        ret['article'] = content.eq(0).children("td").eq(1).text()
+        ret['content'] = content.eq(1).children("td").eq(1).text()
+    elif (url.lower().find("experience_detail.aspx") != -1):
+        ret['title'] = pq("div[class='shows'] h1").html()
+        ret['content'] = pq("div[class='show']").text()
     
     return ret
 
