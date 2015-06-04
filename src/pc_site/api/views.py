@@ -48,4 +48,65 @@ def questtask(request):
         print e
     
     return HttpResponse(json.dumps(ret), content_type = "application/json")
+
+def reportmeta(request):
+    ret = {'error' : 0}
+    task_id = request.REQUEST.get("id")
+    title = request.REQUEST.get("title")
+    author = request.REQUEST.get("author")
+    metadata = request.REQUEST.get("metadata")
+    
+    if None == task_id:
+        ret['error'] = -2
+        ret['error_description'] = 'bad request: task id not found'
+        return HttpResponse(json.dumps(ret), content_type = "application/json")
+    
+    try:
+        data_obj = data.Data(settings.DATA_DIR)
+        data_obj.report_meta(task_id, title, author, metadata)
+    except Exception, e:
+        ret['error'] = -1
+        print e
+    
+    return HttpResponse(json.dumps(ret), content_type = "application/json")
+
+def reportprogress(request):
+    ret = {'error' : 0}
+    task_id = request.REQUEST.get("id")
+    progress = request.REQUEST.get("progress")
+    
+    if None == task_id or None == progress:
+        ret['error'] = 2
+        ret['error_description'] = 'bad request'
+        return HttpResponse(json.dumps(ret), content_type = "application/json")
+    
+    try:
+        data_obj = data.Data(settings.DATA_DIR)
+        data_obj.report_progress(task_id, progress)
+    except Exception, e:
+        ret['error'] = -1
+        print e
+        
+    return HttpResponse(json.dumps(ret), content_type = "application/json")
+
+def reportresult(request):
+    ret = {'error' : 0}
+    task_id = request.REQUEST.get("id")
+    result = request.REQUEST.get("result")
+    result_meta = request.REQUEST.get("resultmeta")
+    
+    if None == task_id:
+        ret['error'] = 2
+        ret['error_description'] = 'bad request'
+        return HttpResponse(json.dumps(ret), content_type = "application/json")
+    
+    try:
+        data_obj = data.Data(settings.DATA_DIR)
+        data_obj.report_result(task_id, result, result_meta)
+    except Exception, e:
+        ret['error'] = -1
+        print e
+        
+    return HttpResponse(json.dumps(ret), content_type = "application/json")
+
     

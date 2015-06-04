@@ -81,7 +81,7 @@ class Data(object):
         
         return ret
     
-    def report_process(self, task_id, process):
+    def report_progress(self, task_id, process):
         sql = '''UPDATE pcdata SET status = ?, update_time = ?, completion = ?
                  WHERE _id = ?'''
         params = (1, int(time.time()), process, task_id)
