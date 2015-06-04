@@ -9,6 +9,7 @@ import sqlite3
 import time
 
 g_mutex = threading.Lock()
+g_processing_timeout = 300
 
 class Data(object):
     def __init__(self, dbfile):
@@ -69,7 +70,7 @@ class Data(object):
             ret = self.dict_fetchone(cursor)
             
             if None != ret:
-                update_param = (1, time.time(), ret['_id'])
+                update_param = (1, int(time.time()), ret['_id'])
                 cursor.execute(sql_update, update_param)
                 self.conn.commit()
             
@@ -83,7 +84,7 @@ class Data(object):
     def report_process(self, task_id, process):
         sql = '''UPDATE pcdata SET status = ?, update_time = ?, completion = ?
                  WHERE _id = ?'''
-        params = (1, time.time(), process, task_id)
+        params = (1, int(time.time()), process, task_id)
         self.conn.cursor().execute(sql, params)
         self.conn.commit()
         
@@ -91,7 +92,7 @@ class Data(object):
         sql = '''UPDATE pcdata SET status = ?, update_time = ?, title = ?,
                 author = ?, meta_data = ?
                 WHERE _id = ?'''
-        params = (1, time.time(), title, author, meta_data, task_id)
+        params = (1, int(time.time()), title, author, meta_data, task_id)
         self.conn.cursor().execute(sql, params)
         self.conn.commit()
     
@@ -99,7 +100,7 @@ class Data(object):
         sql = '''UPDATE pcdata SET status = ?, update_time = ?, result = ?,
                 result_meta = ?, completion = ?
                 WHERE _id = ?'''
-        params = (2, time.time(), result, result_meta, 100, task_id)
+        params = (2, int(time.time()), result, result_meta, 100, task_id)
         self.conn.cursor().execute(sql, params)
         self.conn.commit()
 
@@ -109,3 +110,11 @@ class Data(object):
         cursor.execute(sql, (url, ))
         
         return cursor.fetchone()[0] > 0
+    
+    def restore_timedout_task(self):
+        sql = '''UPDATE pcdata SET status = ? 
+                WHERE status = 1 AND update_time < ?'''
+        params = (0, int(time.time()) - g_processing_timeout, )
+        self.conn.cursor().execute(sql, params)
+        self.conn.commit()
+    

@@ -30,3 +30,22 @@ def addtask(request):
         print e
         
     return HttpResponse(json.dumps(ret), content_type = "application/json")
+
+def questtask(request):
+    ret = {'error' : 0}
+    
+    try:
+        data.Data(settings.DATA_DIR).restore_timedout_task()
+    except:
+        pass
+    
+    try:
+        data_obj = data.Data(settings.DATA_DIR)
+        result = data_obj.request_task()
+        ret['result'] = result
+    except Exception, e:
+        ret['error'] = -1
+        print e
+    
+    return HttpResponse(json.dumps(ret), content_type = "application/json")
+    
