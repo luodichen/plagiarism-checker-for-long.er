@@ -14,7 +14,7 @@ import urllib
 from pyquery import PyQuery
 
 def parse_baidu_link(url):
-    return urllib2.urlopen(url).geturl()
+    return urllib2.urlopen(url, timeout = 10).geturl()
 
 def get_result(keywords):
     ret = []

@@ -67,7 +67,7 @@ def analysis(url, choise = 3):
     return totalpart, match_set
 
 def test():
-    total, match_set = analysis("http://training.hnteacher.net/Elearning/ClassPortal/Experience_detail.aspx?ID=303812&CLASS_ID=4306000000045&Tatget=")
+    total, match_set = analysis("http://training.hnteacher.net/Elearning/ClassPortal/GoodHomeworkDetail.aspx?ID=539144&CLASS_ID=4300000000ef6&Tatget=")
     print 100 * len(match_set) / total
     print match_set
 
