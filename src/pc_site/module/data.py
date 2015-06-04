@@ -103,3 +103,9 @@ class Data(object):
         self.conn.cursor().execute(sql, params)
         self.conn.commit()
 
+    def url_exists(self, url):
+        sql = '''SELECT COUNT(*) FROM pcdata WHERE url = ?'''
+        cursor = self.conn.cursor()
+        cursor.execute(sql, (url, ))
+        
+        return cursor.fetchone()[0] > 0
