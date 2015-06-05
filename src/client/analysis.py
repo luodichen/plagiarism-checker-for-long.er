@@ -40,7 +40,7 @@ def text_match(text_from, text_to):
     
     return matched, total, part_set
 
-def analysis(url, choise = 3):
+def analysis(url, choise = 3, progress_callback = None):
     article_meta = content.get_article_meta(url)
     article_content = pre_process(article_meta['content'])
     keywords = get_keywords(article_content, choise)
@@ -49,26 +49,30 @@ def analysis(url, choise = 3):
     match_set = set()
     details = []
     
+    kw_index = -1
+    kw_length = len(keywords)
     for kw in keywords: 
+        kw_index = kw_index + 1
         try:
             match_urls = bdparser.get_result(kw)
         except:
             continue
+        
+        match_index = -1
+        match_length = len(match_urls)
         for match_url in match_urls:
+            match_index = match_index + 1
             try:
-                match_text = pre_process(content.get_text(match_url))
+                reference, ref_url = content.get_text(match_url)
+                match_text = pre_process(reference)
                 _, totalpart, cur_set = text_match(article_content, match_text)
                 match_set.update(cur_set)
-                details.append((match_url, cur_set))
-                print "%s - %d" % (match_url, 100 * _ / totalpart)
+                details.append((ref_url, list(cur_set), ))
+
+                if None != progress_callback:
+                    progress = 10 + 80 * kw_index / kw_length + (80 / kw_length) * match_index / match_length
+                    progress_callback(progress, ref_url)
             except:
                 continue
     
-    return totalpart, match_set
-
-def test():
-    total, match_set = analysis("http://training.hnteacher.net/Elearning/ClassPortal/GoodHomeworkDetail.aspx?ID=547300&CLASS_ID=4306000000047&Tatget=")
-    print 100 * len(match_set) / total
-    print match_set
-
-test()
+    return totalpart, list(match_set), details

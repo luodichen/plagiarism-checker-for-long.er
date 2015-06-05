@@ -15,8 +15,9 @@ def remove_html_label(original):
     return r.sub('', original)
 
 def get_text(url):
-    pq = PyQuery(urllib2.urlopen(url, timeout = 10).read())
-    return pq("body").text()
+    urlfile = urllib2.urlopen(url, timeout = 10)
+    pq = PyQuery(urlfile.read())
+    return pq("body").text(), urlfile.geturl()
 
 def get_article_meta(url):
     ret = {}

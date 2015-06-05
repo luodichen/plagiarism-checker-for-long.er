@@ -25,7 +25,8 @@ def get_result(keywords):
     
     for i in range(0, count):
         try:
-            ret.append(parse_baidu_link(match.eq(i).attr("href")))
+            #ret.append(parse_baidu_link(match.eq(i).attr("href")))
+            ret.append(match.eq(i).attr("href"))
         except:
             pass
         
