@@ -1,14 +1,37 @@
 from django.shortcuts import render
-from django.http.response import HttpResponse
+from django.http.response import HttpResponse, HttpResponseRedirect
 from pc_site import settings
 from module import data
 from module import utils
+import auth
 import json
 
 # Create your views here.
 
 def test(request):
     return HttpResponse("Hello~")
+
+def login(request):
+    result = {}
+    
+    user = request.REQUEST.get('user')
+    password = request.REQUEST.get('password')
+    
+    login_state = auth.user_auth(user, password)
+    result['result'] = login_state
+    
+    if login_state:
+        auth.set_login(request)
+    
+    return HttpResponse(json.dumps(result), content_type = "application/json")
+
+def logout(request):
+    auth.set_logout(request)
+    request_redirect = request.REQUEST.get('redirect')
+    if None == request_redirect:
+        return HttpResponse("OK")
+    else:
+        return HttpResponseRedirect(request_redirect)
 
 def addtask(request):
     ret = {'error' : 0}

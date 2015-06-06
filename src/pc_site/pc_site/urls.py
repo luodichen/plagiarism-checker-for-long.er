@@ -20,4 +20,6 @@ urlpatterns = [
     #url(r'^admin/', include(admin.site.urls)),
     url(r'^api/', include('api.urls')),
     url(r'^pages/', include('pages.urls')),
+    url(r'^$', 'pages.views.index'),
+    url(r'^/$', 'pages.views.index'),
 ]

@@ -42,7 +42,7 @@
             <!-- </div> -->
           </ul>
           <ul class="nav navbar-nav navbar-right hidden-sm">
-            <li><a href="#">sign out</a></li>
+            <li><a href="/api/logout/?redirect=%2fpages%2flogin%2f">sign out</a></li>
           </ul>
         </div>
       </div>
@@ -148,6 +148,7 @@
                       }
                   } else {
                       $("#input-url").val("");
+                      query_list();
                   }
                   
                   enable_obj($("#button-add"), true);

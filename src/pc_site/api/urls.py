@@ -14,4 +14,6 @@ urlpatterns = [
     url(r'^report/progress/$', 'api.views.reportprogress'),
     url(r'^report/result/$', 'api.views.reportresult'),
     url(r'^query/list/$', 'api.views.querylist'),
+    url(r'login/$', 'api.views.login'),
+    url(r'logout/$', 'api.views.logout'),
 ]

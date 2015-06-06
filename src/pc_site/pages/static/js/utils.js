@@ -83,8 +83,8 @@ function parse_to_table(data) {
         ret += '<td>' + replace_null(row['author'], '-') + '</td>';
         ret += '<td>' + new Date(row['create_time'] * 1000).pattern("yyyy-MM-dd HH:mm") + '</td>';
         
-        if (0 == row['status']) {
-            ret += '<td>-</td><td>-</td>';
+        if (2 != row['status']) {
+            ret += '<td>-</td><td class="text-right">-</td>';
         } else {
 	        ret += judge(row['result']);
 	        ret += '<td class="text-right">' + ((null == row['result']) ? '-' : (String(row['result']) + '%')) + '</td>';
