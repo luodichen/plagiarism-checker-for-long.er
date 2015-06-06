@@ -89,6 +89,11 @@
                 query_list();
             });
             
+            $(".navbar-form").submit(function() {
+                add_url();
+                return false;
+            });
+            
             query_list();
         });
         
