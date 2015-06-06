@@ -8,6 +8,7 @@ Created on Jun 2, 2015
 import string
 import content
 import bdparser
+import utils
 
 PART_SIZE = 12
 KEYWORD_LENGTH = 36
@@ -40,8 +41,12 @@ def text_match(text_from, text_to):
     
     return matched, total, part_set
 
-def analysis(url, choise = 3, progress_callback = None):
+def analysis(url, choise = 3, progress_callback = None, meta_callback = None):
     article_meta = content.get_article_meta(url)
+    
+    if None != meta_callback:
+        meta_callback(article_meta)
+    
     article_content = pre_process(article_meta['content'])
     keywords = get_keywords(article_content, choise)
     
@@ -64,6 +69,10 @@ def analysis(url, choise = 3, progress_callback = None):
             match_index = match_index + 1
             try:
                 reference, ref_url = content.get_text(match_url)
+                
+                if utils.regular_url(url) != None and utils.regular_url(url) == utils.regular_url(ref_url):
+                    continue
+                
                 match_text = pre_process(reference)
                 _, totalpart, cur_set = text_match(article_content, match_text)
                 match_set.update(cur_set)

@@ -23,8 +23,14 @@ class Data(object):
         if None == result:
             return None
         else:
-            desc = (x[0] for x in cursor.description)
+            desc = tuple(x[0] for x in cursor.description)
             return dict(zip(desc, result))
+        
+    @staticmethod
+    def dict_fetchall(cursor):
+        result = cursor.fetchall()
+        desc = tuple(x[0] for x in cursor.description)
+        return [dict(zip(desc, y)) for y in result]
     
     def create(self):
         # status
@@ -118,3 +124,11 @@ class Data(object):
         self.conn.cursor().execute(sql, params)
         self.conn.commit()
     
+    def query_list(self, params):
+        sql = '''SELECT _id, title, author, url, create_time, update_time, status, result
+                FROM pcdata
+                ORDER BY create_time DESC'''
+        cursor = self.conn.cursor()
+        cursor.execute(sql)
+        return self.dict_fetchall(cursor)
+        

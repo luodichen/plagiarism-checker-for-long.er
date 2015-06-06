@@ -15,7 +15,7 @@ import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = BASE_DIR + "/" + "data.db"
-
+TEMPLATE_PATH = BASE_DIR + "/" + "template"
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
@@ -26,7 +26,7 @@ SECRET_KEY = 'pm$1r^-shru24rvnar)0$@*8z+t0kjnl%=6q1990e*(g(tq#$k'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -39,6 +39,7 @@ INSTALLED_APPS = (
     #'django.contrib.messages',
     'django.contrib.staticfiles',
     'api',
+    'pages',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -57,7 +58,7 @@ ROOT_URLCONF = 'pc_site.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [TEMPLATE_PATH],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

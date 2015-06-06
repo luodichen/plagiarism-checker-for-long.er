@@ -39,6 +39,10 @@ def get_article_meta(url):
     elif (url.lower().find("experience_detail.aspx") != -1):
         ret['title'] = pq("div[class='shows'] h1").html()
         ret['content'] = pq("div[class='show']").text()
+        ret['publish'] = None
+        ret['publish_date'] = None
+        ret['submit'] = None
+        ret['submit_date'] = None
     
     return ret
 

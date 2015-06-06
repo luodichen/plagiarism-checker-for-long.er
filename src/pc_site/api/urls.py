@@ -13,4 +13,5 @@ urlpatterns = [
     url(r'^report/meta/$', 'api.views.reportmeta'),
     url(r'^report/progress/$', 'api.views.reportprogress'),
     url(r'^report/result/$', 'api.views.reportresult'),
+    url(r'^query/list/$', 'api.views.querylist'),
 ]

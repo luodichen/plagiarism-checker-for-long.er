@@ -109,4 +109,15 @@ def reportresult(request):
         
     return HttpResponse(json.dumps(ret), content_type = "application/json")
 
+def querylist(request):
+    ret = {'error' : 0}
+    
+    try:
+        data_obj = data.Data(settings.DATA_DIR)
+        ret['result'] = data_obj.query_list(None)
+    except Exception, e:
+        ret['error'] = -1
+        print e
+        
+    return HttpResponse(json.dumps(ret), content_type = "application/json")
     

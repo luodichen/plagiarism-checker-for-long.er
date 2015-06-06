@@ -47,6 +47,19 @@ def report_result(task_id, result, resultmeta):
     
     return response['error']
 
+def report_meta(task_id, metadata):
+    url = API_URL + "/report/meta/"
+    data = {'id' : task_id, 'title' : metadata['title'], 
+            'author' : metadata['submit'], 'metadata' : json.dumps(metadata)}
+    
+    try:
+        response = json.loads(urllib2.urlopen(url, urlencode(data)).read())
+    except Exception, e:
+        print e
+        return -1
+    
+    return response['error']
+
 def main():
     while True:
         try:
@@ -58,17 +71,16 @@ def main():
             
             url = task['url']
             print "new task " + url
-            prev_progress_val = 0
             
             def progress(val, url):
                 print "%d%% checked - %s" % (val, url)
-                #print prev_progress_val
-                #if val - prev_progress_val > 20:
-                #    report_progress(task['_id'], val)
-                #    prev_progress_val = val
-                #    print "report progress %d" % (val, )
+                
+            def meta(metadata):
+                print metadata['title']
+                print "task_id = %d, reporting metadata to server......" % (task['_id'], )
+                print "ok." if 0 == report_meta(task['_id'], metadata) else "failed."
             
-            totalpart, match_set, details = analysis.analysis(url, progress_callback = progress)
+            totalpart, match_set, details = analysis.analysis(url, progress_callback = progress, meta_callback = meta)
             result = 100 * len(match_set) / totalpart
             print "completed. result = %d%%" % (result, )
             print "reporting to server......"

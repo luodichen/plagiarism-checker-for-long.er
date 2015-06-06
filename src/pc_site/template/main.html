@@ -1,0 +1,164 @@
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    {% load staticfiles %}
+    <title>Plagiarism Checker for Long'er</title>
+    <script src="http://cdn.bootcss.com/jquery/1.11.2/jquery.min.js"></script>
+    <script src="http://cdn.bootcss.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <link href="http://cdn.bootcss.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/main.css' %}" />
+  </head>
+  <body>
+    <div class="navbar navbar-default navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#">Plagiarism<sup> checker</sup></a>
+        </div>
+        <div class="navbar-collapse collapse" role="navigation">
+          <ul class="nav navbar-nav">
+            <form class="navbar-form" role="search">
+              <div class="input-group">
+                <input id="input-url" type="text" class="form-control" placeholder="输入链接" 
+                    data-toggle="popover" data-placement="bottom" data-trigger="manual" />
+                <span class="input-group-btn">
+                  <button class="btn btn-default" type="button" id="button-add">添加</button>
+                </span>
+              </div><!-- /input-group -->
+            </form>
+          </ul>
+          <ul class="nav navbar-nav navbar-left btn-group">
+            <!-- <div class="btn-group"> -->
+              <botton id="button-refresh" type="button" class="btn btn-default navbar-btn">刷新</botton>
+              <button type="button" class="btn btn-default dropdown-toggle navbar-btn" data-toggle="dropdown" aria-expanded="false">
+                  全部 <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu" role="menu">
+                <li><a href="#">全部</a></li>
+                <li class="divider"></li>
+                <li><a href="#">严重抄袭</a></li>
+                <li><a href="#">抄袭</a></li>
+                <li><a href="#">非抄袭</a></li>
+              </ul>
+            <!-- </div> -->
+          </ul>
+          <ul class="nav navbar-nav navbar-right hidden-sm">
+            <li><a href="#">sign out</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+    <div class="container">
+	  <table class="table table-hover" id="data_table">
+	    <thead>
+	    <tr>
+	      <th class="col-md-1">状态</th>
+	      <th class="col-md-4">标题</th>
+	      <th class="col-md-1">作者</th>
+	      <th class="col-md-2">提交时间</th>
+	      <th class="col-md-1">判定</th>
+	      <th class="col-md-1 text-right">重合率</th>
+	    </tr>
+	    </thead>
+	    <tfoot>
+	      <td colspan="6">
+	        <nav>
+	          <ul class="pagination">
+	          </ul>
+	        </nav>
+	      </td>
+	    </tfoot>
+	    <tbody>
+	    </tbody>
+	  </table>
+    </div>
+    
+    <script src="{% static 'js/utils.js' %}"></script>
+    <script type="text/javascript">
+    
+        $(document).ready(function() {
+            $("#button-add").click(function() {
+                add_url();
+            });
+            
+            $("#input-url").bind('input propertychange', function() {
+                $(this).popover("hide");
+            });
+            
+            $("#button-refresh").click(function() {
+                query_list();
+            });
+            
+            query_list();
+        });
+        
+        function query_list() {
+            url = "/api/query/list/";
+            
+            enable_obj($("#button-refresh"), false);
+            $.ajax({
+                url: url,
+                data: null,
+                type: 'post',
+                cache: false,
+                dataType: 'json',
+                
+                success: function(data) {
+                    if (0 != data.error) {
+                        alert(data.error_description);
+                    } else {
+                        $("#data_table tbody").html(parse_to_table(data.result));
+                    }
+                    enable_obj($("#button-refresh"), true);
+                },
+                
+                error: function() {
+                    alert("请求失败，请稍后再试");
+                    enable_obj($("#button-refresh"), true);
+                }
+            });
+        }
+        
+        function add_url() {
+            post_url = "/api/addtask/";
+            url = $("#input-url").val();
+            if ("" == url) {
+                $("#input-url").attr("data-content", "不能为空");
+                $("#input-url").popover("show");
+                return;
+            }
+            
+            enable_obj($("#button-add"), false);
+            $.ajax({
+              url: post_url,
+              data: {url:url},
+              type: 'post',
+              cache: false,
+              dataType: 'json',
+              
+              success: function(data) {
+                  if (0 != data.error) {
+                      if (-1 == data.error) {
+                          alert("服务端错误。");
+                      } else {
+                          $("#input-url").attr("data-content", data.error_description);
+                          $("#input-url").popover("show");
+                          
+                          $("#input-url").val("");
+                      }
+                  } else {
+                      $("#input-url").val("");
+                  }
+                  
+                  enable_obj($("#button-add"), true);
+              },
+              
+              error: function() {
+                  alert("请求失败，请稍后再试");
+                  enable_obj($("#button-add"), true);
+              }
+          });
+        }
+    </script>
+  </body>
+</html>
