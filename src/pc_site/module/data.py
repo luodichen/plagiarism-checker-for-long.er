@@ -124,11 +124,18 @@ class Data(object):
         self.conn.cursor().execute(sql, params)
         self.conn.commit()
     
-    def query_list(self, params):
+    def query_list(self, params, page = 0, items_per_page = 20):
         sql = '''SELECT _id, title, author, url, create_time, update_time, status, result
                 FROM pcdata
-                ORDER BY create_time DESC'''
+                ORDER BY create_time DESC
+                LIMIT ?, ?'''
+        query_params = (page * items_per_page, items_per_page, )
+        cursor = self.conn.cursor()
+        cursor.execute(sql, query_params)
+        return self.dict_fetchall(cursor)
+    
+    def query_count(self, params):
+        sql = ''' SELECT COUNT(*) FROM pcdata'''
         cursor = self.conn.cursor()
         cursor.execute(sql)
-        return self.dict_fetchall(cursor)
-        
+        return cursor.fetchone()[0]

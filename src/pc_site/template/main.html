@@ -75,7 +75,11 @@
     
     <script src="{% static 'js/utils.js' %}"></script>
     <script type="text/javascript">
-    
+        var rows_per_page = 20;
+        var current_page = 0;
+        var rows_count = -1;
+        var data_obj = null;
+        
         $(document).ready(function() {
             $("#button-add").click(function() {
                 add_url();
@@ -86,7 +90,8 @@
             });
             
             $("#button-refresh").click(function() {
-                query_list();
+                rows_count = -1;
+                query_list(0);
             });
             
             $(".navbar-form").submit(function() {
@@ -94,17 +99,45 @@
                 return false;
             });
             
-            query_list();
+            rows_count = -1;
+            query_list(0);
         });
         
-        function query_list() {
+        function query_count() {
+            var ret = 0;
+            $.ajax({
+                url: "/api/query/count/",
+                data: null,
+                type: 'post',
+                cache: false,
+                async: false,
+                dataType: 'json',
+                
+                success: function(data) {
+                    if (0 != data.error) {
+                        ret = -1;
+                    } else {
+                        ret = data.result;
+                    }
+                },
+                
+                error: function() {
+                
+                }
+            });
+            
+            return ret;
+        }
+        
+        function query_list(page) {
             url = "/api/query/list/";
             
+            current_page = page;
             enable_obj($("#button-refresh"), false);
             $.ajax({
                 url: url,
-                data: null,
-                type: 'post',
+                data: {page: page},
+                type: 'get',
                 cache: false,
                 dataType: 'json',
                 
@@ -113,6 +146,10 @@
                         alert(data.error_description);
                     } else {
                         $("#data_table tbody").html(parse_to_table(data.result));
+                        data_obj = data.result;
+                        
+                        rows_count = (-1 == rows_count) ? query_count() : rows_count;
+                        $("#data_table tfoot ul").html(pagination(Math.ceil(rows_count / rows_per_page), current_page + 1));
                     }
                     enable_obj($("#button-refresh"), true);
                 },
@@ -122,6 +159,10 @@
                     enable_obj($("#button-refresh"), true);
                 }
             });
+        }
+        
+        function page_bar_click(page) {
+            query_list(page - 1);
         }
         
         function add_url() {

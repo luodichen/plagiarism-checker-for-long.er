@@ -6,7 +6,7 @@ from module import utils
 import auth
 import json
 
-# Create your views here.
+ROWS_PER_PAGE = 20
 
 def test(request):
     return HttpResponse("Hello~")
@@ -134,13 +134,26 @@ def reportresult(request):
 
 def querylist(request):
     ret = {'error' : 0}
+    page = request.REQUEST.get("page")
+    page = int(0 if None == page else page)
     
     try:
         data_obj = data.Data(settings.DATA_DIR)
-        ret['result'] = data_obj.query_list(None)
+        ret['result'] = data_obj.query_list(None, page, ROWS_PER_PAGE)
     except Exception, e:
         ret['error'] = -1
         print e
         
     return HttpResponse(json.dumps(ret), content_type = "application/json")
     
+def querycount(request):
+    ret = {'error' : 0}
+    
+    try:
+        data_obj = data.Data(settings.DATA_DIR)
+        ret['result'] = data_obj.query_count(None)
+    except Exception, e:
+        ret['error'] = -1
+        print e
+        
+    return HttpResponse(json.dumps(ret), content_type = "application/json")
